@@ -23,6 +23,6 @@ def download_images_from_md(md_file, save_dir):
                     print(f'Downloaded image: {save_path}')
 
 # 示例用法
-md_file = r'D:\web\Blog\src\Arthur\搜狗问问\我的提问\merge.md'  # 替换为实际的.md文件路径
-save_dir = r'D:\web\搜狗问问\PicDownload'  # 替换为实际的保存目录路径
+md_file = r'./Download2/merge.md'  # 替换为实际的.md文件路径
+save_dir = r'./PicDownload'  # 替换为实际的保存目录路径
 download_images_from_md(md_file, save_dir)

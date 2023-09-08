@@ -1,7 +1,7 @@
 import os
 
-input_path = "./Download_我的提问"  # 替换为实际的源目录路径
-output_path = "./我的提问"  # 替换为实际的目标目录路径
+input_path = "./Download"  # 替换为实际的源目录路径
+output_path = "./Download2"  # 替换为实际的目标目录路径
 
 for filename in os.listdir(input_path):
     if filename.endswith(".md"):
