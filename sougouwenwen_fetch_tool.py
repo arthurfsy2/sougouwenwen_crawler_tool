@@ -2,7 +2,7 @@ import requests
 import argparse
 import re
 from bs4 import BeautifulSoup
-
+import html2text
 
 parser = argparse.ArgumentParser()
 parser.add_argument("base_url", help="输入帖子地址")
@@ -30,6 +30,12 @@ if title_tag:
 else:
     title = ""
 
+# 如果标题超过30个字符，则截取前50个字符并添加"..."作为文件名
+if len(title) > 30:
+    file_name = title[:30] + "..."
+else: file_name = title
+
+
 # 提取用户信息
 user_info_tags = soup.find_all("div", class_="user-name-box")
 user_contents = [user_info.find("a", class_="user-name").text if user_info.find("a", class_="user-name") else "匿名用户" for user_info in user_info_tags]
@@ -40,11 +46,19 @@ user_contents = [user_info.find("a", class_="user-name").text if user_info.find(
 
 # 提取问题内容
 question_tag = soup.find("pre", class_="detail-tit-info")
+question_content = ""
 if question_tag:
-    question_content = question_tag.text
+    html = str(question_tag)
+    #print(f"question_content_html:{html}--end\n\n\n\n")
+    markdown = html2text.html2text(html)
+    #print(f"question_tag_markdown:{markdown}--end\n\n\n\n")
+    markdown = re.sub('\r|\n| ', '', markdown)
+    markdown = re.sub('!\[\]\((.*?)\)', r'\n![](\1)\n', markdown)
+    question_content=markdown
 else:
 # 如果问题详情为空，则取标题描述作为问题内容
     question_content = title
+
 
 # 判断问题是否存在图片标签
 question_image_tag = soup.find("div", id="question_images")
@@ -68,20 +82,14 @@ print(f"问题图片链接:{question_picUrl}")
 
 answer_tags = soup.find_all("pre", class_="replay-info-txt answer_con")
 answer_contents = []
-# 判断回答是否存在图片标签,如果有，则循环获取该回答所有的照片
 for answer in answer_tags:
-    img_tags = answer.find_all('img')
-    if img_tags:
-        img_src_list = [img['src'] for img in img_tags]
-        img_links = [f"![]({img_src})\r\n" for img_src in img_src_list]
-        img_links_text = " ".join(img_links)
-        #print(f"img_links_text:{img_links_text}")
-        answer_text = answer.text
-        answer_contents.append(f"{answer_text}{img_links_text} ")
-        #print(f"answer_tags:{answer_tags}\n\n\nanswer_contents:{answer_contents}")
-    else:
-        answer_contents.append(answer.text)
-        #print(f"answer_tags:{answer_tags}\n\n\nanswer_contents:{answer_contents}")
+    html = str(answer)
+    markdown = html2text.html2text(html)
+    #print(f"markdown:{markdown}--end\n\n\n\n")
+    markdown = re.sub('\r|\n| ', '', markdown)
+    markdown = re.sub('!\[\]\((.*?)\)', r'\n![](\1)\n', markdown)
+    answer_contents.append(markdown)
+
 
 # 提取回答内容和日期
 dates = soup.find_all("div", class_="user-txt")
@@ -96,16 +104,6 @@ for date in dates:
     elif "回答" in date.text:
         answer_dates.append(date.text)
         
-
-
-
-
-# 如果标题超过30个字符，则截取前50个字符并添加"..."作为文件名
-if len(title) > 30:
-    file_name = title[:30] + "..."
-else: file_name = title
-#print(f"file_name:{file_name}--结束")
-
 # 替换文件名中无效字符和换行符为空格
 file_name = re.sub(r'[<>:"/\\|?*\n]', ' ', file_name)
 
@@ -121,8 +119,6 @@ with open(output_path, 'w', encoding='utf-8') as file:
     file.write(f"**{user_contents[0]}**\n{question_dates}\n> {question_content}\n\n{question_picUrl}\n\n")
     i=0
     for i in range(len(answer_dates)):
-        answer_contents[i] = re.sub(r'[\n]', '> ', answer_contents[i])
-        
         file.write(f"---\n")
         file.write(f"**{user_contents[i+1]}**\n{answer_dates[i]}\n> {answer_contents[i]}\n\n")
 
