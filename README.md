@@ -1,4 +1,4 @@
-一个可以批量爬取指定搜狗问问问题链接，下载并转换为.md格式的python脚本。
+一个可以批量爬取你个人账号的搜狗问问-我的提问/我的回答，下载并转换为.md格式的python脚本。
 
 （一个关于你青春黑历史的备份）
 
@@ -13,33 +13,29 @@
 
 使用：
 
-1. 在 `base_url.txt`文件内填入需要备份的链接，`wenwen.sogou.com/question/XXX`或 `wenwen.sogou.com/z/XXX`格式，且一行只能有一个地址。以下仅为示意参考：
+1. 登陆[搜狗问问](https://wenwen.sogou.com/)-打开”我的提问“，按下F12按键，打开开发者模式。
 
-```
-https://wenwen.sogou.com/z/q1713280989.htm?ch=ww.sy.wwzl
-https://wenwen.sogou.com/question/q1227625514349824078.htm?ch=ww.sy.tj&pid=ww.sy.tj
-```
+2. 选择“my-list?my-list?**tp=10**"开头的网页，复制标头中的请求URL()、Cookie，分别填入到`script/config.json`文件当中的"questionUrl"、"Cookie"当中，并将”我的提问“的总页数填入到"questionPageNum"“字段当中
 
-2. 在项目当前目录运行 `py multi_sougouwenwen_spy.py`即可将结果下载并处理为.md格式，并保存到 `Download`文件夹
-   注意：本脚本设置了间隔1秒钟再备份下一个地址（防止封IP）
-   可以修改以下代码的time.sleep(1)的数字，或者直接注释掉 `time.sleep(10)`该行
+   ![](img/20231201222646.png)
 
-```
-for url in base_url:
-    print(f'命令：py "tieba_fetch_tool.py" {url}')
-    command = f'py {tool_path} "{url}"'
-    subprocess.run(command)
-    time.sleep(10)  # 在每次循环后等待N秒，防止封IP
-```
+   ![](img/20231201223124.png)
+
+3. 打开”我的回答“，按下F12按键，打开开发者模式。选择“my-list?my-list?**tp=20**"开头的网页，复制标头中的请求URL()、填入到`script/config.json`文件当中的"answerUrl"当中（Cookie可以用“我的提问”的），并将”我的回答“的总页数填入到"answerPageNum"字段当中
+
+4. 修改`script/config.json`的"nickname"（配合vuepress使用，对应frontmatter的`category:$nickname`
+
+5. 在项目当前目录运行 `py ./script/sougouwenwen_fetch_tool.py`即可将结果下载并处理为.md格式，并保存到 `ouput`文件夹
+   注意：将会生成2个list.md、2个merge.md文件，分别对应提问/回答列表及各个页面的详细内容。
+
+
 
 可选功能：
 
-1. 批量获取[问问个人中心](https://wenwen.sogou.com/user/center/)的各个提问/回答页面的base_url地址
-   * 手动复制个人中心提问/回答列表，用 `Typora`打开在base_url.md，然后粘贴在该文件当中，会自动转换成markdown的格式
-   * 运行 `py base_url_extract.py`，通过 `base_url_extract.py`获取并导出链接到 `base_url.txt`。
-2. 批量添加frontmatter（配合vuepress使用，可将处理后的.md作为vuepress的页面展示）
+1. vuepress模板：
+
+   可以修改`./template`目录下的2个模板的frontmatter（配合vuepress使用，可将处理后的.md作为vuepress的页面展示）
    运行 `py ADDfrontmatter.py`，即可将添加好frontmatter内容的文件添加到 `Download2`文件夹
-3. 批量将多个.md文件合并为一个.md文件
-   运行 `PY mergeMD.py`，即可将多个.md文件合并为merge.md，并添加到 `Download2`文件夹
-4. 下载markdown文件内所有 `![](xxx.jpg)`的图片
-   运行 `PY mdPicDownload.py`，即可批量下载图片到 `PicDownload`文件夹。（需要在 `mdPicDownload.py`内设置需要读取的markdown文件路径。
+
+2. 下载markdown文件内所有 `![](xxx.jpg)`的图片
+   运行 `PY mdPicDownload.py`，即可批量下载2个merge.md的图片到 `PicDownload`文件夹。（可在 `mdPicDownload.py`内修改需要读取的markdown文件路径，默认为读取/output/mergeXXX.md。
