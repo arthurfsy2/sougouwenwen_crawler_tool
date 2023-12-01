@@ -13,19 +13,21 @@
 
 使用：
 
-1. 登陆[搜狗问问](https://wenwen.sogou.com/)-打开”我的提问“，按下F12按键，打开开发者模式。
+1. 将`configBAK.json`修改为`script/config.json`
 
-2. 选择“my-list?my-list?**tp=10**"开头的网页，复制标头中的请求URL()、Cookie，分别填入到`script/config.json`文件当中的"questionUrl"、"Cookie"当中，并将”我的提问“的总页数填入到"questionPageNum"“字段当中
+2. 登陆[搜狗问问](https://wenwen.sogou.com/)-打开”我的提问“，按下F12按键，打开开发者模式。
+
+3. 选择“my-list?my-list?**tp=10**"开头的网页，复制标头中的请求URL()、Cookie，分别填入到`script/config.json`文件当中的"questionUrl"、"Cookie"当中，并将”我的提问“的总页数填入到"questionPageNum"“字段当中
 
    ![](img/20231201222646.png)
 
    ![](img/20231201223124.png)
 
-3. 打开”我的回答“，按下F12按键，打开开发者模式。选择“my-list?my-list?**tp=20**"开头的网页，复制标头中的请求URL()、填入到`script/config.json`文件当中的"answerUrl"当中（Cookie可以用“我的提问”的），并将”我的回答“的总页数填入到"answerPageNum"字段当中
+4. 打开”我的回答“，按下F12按键，打开开发者模式。选择“my-list?my-list?**tp=20**"开头的网页，复制标头中的请求URL()、填入到`script/config.json`文件当中的"answerUrl"当中（Cookie可以用“我的提问”的），并将”我的回答“的总页数填入到"answerPageNum"字段当中
 
-4. 修改`script/config.json`的"nickname"（配合vuepress使用，对应frontmatter的`category:$nickname`
+5. 修改`script/config.json`的"nickname"（配合vuepress使用，对应frontmatter的`category:$nickname`
 
-5. 在项目当前目录运行 `py ./script/sougouwenwen_fetch_tool.py`即可将结果下载并处理为.md格式，并保存到 `ouput`文件夹
+6. 在项目当前目录运行 `py ./script/sougouwenwen_fetch_tool.py`即可将结果下载并处理为.md格式，并保存到 `ouput`文件夹
    注意：将会生成2个list.md、2个merge.md文件，分别对应提问/回答列表及各个页面的详细内容。
 
 
