@@ -6,6 +6,7 @@ import re
 from bs4 import BeautifulSoup
 import html2text
 import json
+import os
 
 with open("scripts/config.json", "r") as file:
     data = json.load(file)
@@ -132,6 +133,33 @@ def createMergeMD(pageNum,type,url,headers):
         f.write(data)
     print(f"已生成./output/merge_{type}.md")
     print(f"——————————————————")
+    download_pic(data, type)
+
+
+def download_pic(data, type):
+    save_dir = r'./output/PicDownload'
+    image_urls = re.findall(r'!\[\]\((.*?)\)', data)
+    print(image_urls)
+    for url in image_urls:
+        response = requests.get(url)
+        if response.status_code == 200:
+            image_name = url.replace('wapm-', '')
+            if url.endswith('/0'):
+                image_name = url.replace('/0', '.jpg').split('/')[-1]
+                #print("image_name:\n",image_name) 
+            else:
+                image_name = url.split('/')[-1]
+            #print(f"image_name: {image_name}")
+            save_path = os.path.join(save_dir, image_name)
+            with open(save_path, 'wb') as image_file:
+                image_file.write(response.content)
+                print(f'已下载图片: {save_path}')
+            content = data.replace(f"{url}",f"{save_dir}/{image_name}")
+            # print(f'已将: {url}换为{save_dir}/{image_name}')
+            print('————————————————————')
+    with open(f"./output/merge_{type}_local.md", 'w', encoding='utf-8') as file:
+        file.write(content)
+    print(f'已生成本地图片版：merge_{type}_local.md')
 
 def parseContent(type,url,title_init,createTimeStr,score,pv):
     headers = {
